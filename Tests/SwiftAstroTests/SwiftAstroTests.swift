@@ -8,8 +8,16 @@ final class SwiftAstroTests: XCTestCase {
         // results.
         XCTAssertEqual(SwiftAstro().text, "Hello, World!")
     }
+    
+    func testEaster() {
+        let astro = SwiftAstro()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        let easterDate = formatter.date(from: "2000/04/23")!
+        XCTAssertEqual(astro.dateOfEaster(year: 2000), easterDate)
+    }
 
     static var allTests = [
-        ("testExample", testExample),
+        ("easter", testEaster),
     ]
 }
