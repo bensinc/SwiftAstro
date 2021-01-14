@@ -54,7 +54,7 @@ class SwiftAstro  {
         return(AstroDate(month: month, day: day, year: year))
     }
     
-    func julianDayToDate(jd: Double) -> Date {
+    func julianDayToDate(jd: Double) -> AstroDate {
         let julianDate = jd + 0.5
         
         let i = Int(julianDate)
@@ -91,10 +91,8 @@ class SwiftAstro  {
         let hour = Int(24.0 * day.truncatingRemainder(dividingBy: 1))
         
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd hh:mm"
-        let date = formatter.date(from: "\(year)/\(month)/\(Int(day)) \(hour):00")!
-        return(date)
+    
+        return(AstroDate(month: month, day: Int(day), year: year, hour: hour))
     }
     
     func decimalTimeToHMS(decimalTime: Double) -> (hour: Int, minute: Int, second: Double) {
@@ -104,34 +102,25 @@ class SwiftAstro  {
         return(Int(decimalTime), minutes, seconds)
     }
     
-    func decimalTimeToDate(decimalTime: Double) -> Date {
+    func decimalTimeToDate(decimalTime: Double) -> AstroDate {
                    
         let f = decimalTime.truncatingRemainder(dividingBy: 1) * 60.0
         let minutes = Int(f)
         let seconds = f.truncatingRemainder(dividingBy: 1) * 60
         
-        let formatter = DateFormatter()
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"        
-        return(formatter.date(from: "1980/01/01 \(Int(decimalTime)):\(minutes):\(Int(seconds))")!)
+        return(AstroDate(month: 0, day: 0, year: 0, hour: Int(decimalTime), minute: minutes, second: seconds))
+        
     }
     
-    func calculateConstB(date: Date) -> Double {
-        let year = Calendar.current.component(.year, from: date)
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
-        let d = formatter.date(from: "\(year-1)/12/31 6:00:00.000")!
-
+    func calculateConstB(date: AstroDate) -> Double {
+                            
+        let d = AstroDate(month: 12, day: 31, year: date.year - 1, hour: 0)
         let jd = d.julianDayNumber()
         
         let s = jd - 2415020.0
         let t = s / 36525.0
         let r = 6.6460656 + (2400.051262 * t) + (0.00002581 * pow(t, 2))
-        let u = r - (24 * Double(year - 1900))
+        let u = r - (24 * Double(date.year - 1900))
         let b = 24 - u
         return(b)
     }

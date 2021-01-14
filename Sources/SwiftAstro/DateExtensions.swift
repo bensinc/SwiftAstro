@@ -88,92 +88,87 @@ extension Date {
         d += Double(hour)
         return(d)
     }
-    
-
-    
-    func gmtToGST() -> Date {
-        let year = Calendar.current.component(.year, from: self)
-        let month = Calendar.current.component(.month, from: self)
-        let day = Calendar.current.component(.day, from: self)
-        
-        
-
-        
-        var d = Double(self.dayNumber())
-        
-        d *= 0.0657098
-        
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-        
-//        let jd = date.julianDayNumber()
+//    
 //
-//        let s = jd - 2415020.0
-//        let t = s / 36525.0
-//        let r = 6.6460656 + (2400.051262 * t) + (0.00002581 * pow(t, 2))
-//        let u = r - (24 * Double(year - 1900))
-        let b = SwiftAstro().calculateConstB(date: self)
-        
-        let t0 = d - b
-        
-        let gmtDecimal = self.decimalTime() * 1.002738
-        
-        var t1 = t0 + gmtDecimal
-        
-        if (t1 > 24) {
-            t1 -= 24.0
-        } else if (t1 < 0) {
-            t1 += 24.0
-        }
-        
-        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
-        
-        let fractionalSeconds = result.2.rounded(toPlaces: 3)
-        
-        let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
-        let gstDate = formatter.date(from: fs)!
-        return(gstDate)
-    }
-    
-    func gstToGMT() -> Date {
-        let year = Calendar.current.component(.year, from: self)
-        let month = Calendar.current.component(.month, from: self)
-        let day = Calendar.current.component(.day, from: self)
-        
-        var d = Double(self.dayNumber())
-        d *= 0.0657098
-        let b = SwiftAstro().calculateConstB(date: self)
-        
-        
-        
-        var t0 = d - b
-        if (t0 < 0) {
-            t0 += 24
-        }
-        
-        let gstDecimal = self.decimalTime()
-        
-        var t1 = gstDecimal - t0
-        if (t1 < 0) {
-            t1 += 24
-        }
-        
-        t1 *= 0.997270
-        
-        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
-        
-        let fractionalSeconds = result.2.rounded(toPlaces: 3)
-        
-        let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
-        let gmtDate = formatter.date(from: fs)!
-        return(gmtDate)
-    }
+//    
+//    func gmtToGST() -> Date {
+//        let year = Calendar.current.component(.year, from: self)
+//        let month = Calendar.current.component(.month, from: self)
+//        let day = Calendar.current.component(.day, from: self)
+//        
+//        
+//
+//        
+//        var d = Double(self.dayNumber())
+//        
+//        d *= 0.0657098
+//        
+//        
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
+//        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+//
+//        
+//
+//        let b = SwiftAstro().calculateConstB(date: self)
+//        
+//        let t0 = d - b
+//        
+//        let gmtDecimal = self.decimalTime() * 1.002738
+//        
+//        var t1 = t0 + gmtDecimal
+//        
+//        if (t1 > 24) {
+//            t1 -= 24.0
+//        } else if (t1 < 0) {
+//            t1 += 24.0
+//        }
+//        
+//        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
+//        
+//        let fractionalSeconds = result.2.rounded(toPlaces: 3)
+//        
+//        let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
+//        let gstDate = formatter.date(from: fs)!
+//        return(gstDate)
+//    }
+//    
+//    func gstToGMT() -> Date {
+//        let year = Calendar.current.component(.year, from: self)
+//        let month = Calendar.current.component(.month, from: self)
+//        let day = Calendar.current.component(.day, from: self)
+//        
+//        var d = Double(self.dayNumber())
+//        d *= 0.0657098
+//        let b = SwiftAstro().calculateConstB(date: self)
+//        
+//        
+//        
+//        var t0 = d - b
+//        if (t0 < 0) {
+//            t0 += 24
+//        }
+//        
+//        let gstDecimal = self.decimalTime()
+//        
+//        var t1 = gstDecimal - t0
+//        if (t1 < 0) {
+//            t1 += 24
+//        }
+//        
+//        t1 *= 0.997270
+//        
+//        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
+//        
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
+//        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+//        
+//        
+//        let fractionalSeconds = result.2.rounded(toPlaces: 3)
+//        
+//        let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
+//        let gmtDate = formatter.date(from: fs)!
+//        return(gmtDate)
+//    }
 }

@@ -24,63 +24,36 @@ final class SwiftAstroTests: XCTestCase {
     }
 
     func testJulianDayToDate() {
-        let astro = SwiftAstro()
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd hh:mm"
-        let date = formatter.date(from: "1985/2/17 06:00")!
-        XCTAssertEqual(date, astro.julianDayToDate(jd: 2446113.75))
+        XCTAssertEqual(AstroDate(month: 2, day: 17, year: 1985, hour: 6), SwiftAstro().julianDayToDate(jd: 2446113.75))
     }
 
     func testDayOfWeek() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        let date = formatter.date(from: "2021/1/13")!
-        XCTAssertEqual(date.dayOfWeek(), "Wednesday")
+        XCTAssertEqual(AstroDate(month: 2, day: 17, year: 1985).dayOfWeek(), "Sunday")
     }
 
     func testDecimalTime() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
-        let date = formatter.date(from: "1985/2/17 18:31:27")!
-        XCTAssertEqual(date.decimalTime(), 18.5241666666666666)
+        XCTAssertEqual(AstroDate(month: 2, day: 17, year: 1985, hour: 18, minute: 31, second: 27.0).decimalTime(), 18.5241666666666666)
     }
 
     func testDecimalTimeToDate() {
-        let astro = SwiftAstro()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        let date = formatter.date(from: "1980/01/01 18:31:26")!
-        XCTAssertEqual(date, astro.decimalTimeToDate(decimalTime: 18.5241666666666666))
+        XCTAssertEqual(AstroDate(month: 0, day: 0, year: 0, hour: 18, minute: 31, second: 26), SwiftAstro().decimalTimeToDate(decimalTime: 18.5241666666666666))
     }
     
     func testGMTtoGST() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        let date = formatter.date(from: "1980/04/22 14:36:51.670")!
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
-        let gstDate = formatter.date(from: "1980/04/22 04:40:4.493")!
-
+        let date = AstroDate(month: 4, day: 22, year: 1980, hour: 14, minute: 36, second: 51.670)
+        let gstDate = AstroDate(month: 4, day: 22, year: 1980, hour: 4, minute: 40, second: 4.493)
         XCTAssertEqual(date.gmtToGST(), gstDate)
     }
     
-    func testGSTtoGMT() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        let date = formatter.date(from: "1980/04/22 04:40:5.17")!
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-
-        let gstDate = formatter.date(from: "1980/04/22 14:36:51.534")!
-        
-        XCTAssertEqual(date.gstToGMT(), gstDate)
+    func testGSTtoGMT() { 
+        let date = AstroDate(month: 4, day: 22, year: 1980, hour: 4, minute: 40, second: 5.17)
+        let gmtDate = AstroDate(month: 4, day: 22, year: 1980, hour: 14, minute: 36, second: 51.534)
+        XCTAssertEqual(date.gstToGMT(), gmtDate)
     }
     
     func testB() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
-        let date = formatter.date(from: "1979/01/01 00:00:00.000")!
+        let date = AstroDate(month: 1, day: 1, year: 1979)
         XCTAssertEqual(SwiftAstro().calculateConstB(date: date).rounded(toPlaces: 6), 17.395559)
     }
     

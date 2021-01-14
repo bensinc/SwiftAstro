@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AstroDate : Comparable, Equatable {
+class AstroDate : Comparable, Equatable, CustomDebugStringConvertible {
     var month: Int
     var day: Int
     var year: Int
@@ -15,6 +15,10 @@ class AstroDate : Comparable, Equatable {
     var hour: Int
     var minute: Int
     var second: Double
+    
+    var debugDescription: String {
+        return "AstroDate: \(month)/\(day)/\(year) \(hour):\(minute):\(second)"
+    }
     
     
     //MARK: Initializers
@@ -129,5 +133,81 @@ class AstroDate : Comparable, Equatable {
         let jd = Double(b) + Double(c) + Double(d) + Double(day) + (Double(hour) / 24.0) + 1720994.5
         return(jd)
     }
+    
+    func dayOfWeek() -> String {
+        let jd = self.julianDayNumber()
+        let a = (jd + 1.5) / 7.0
+        let b = a.truncatingRemainder(dividingBy: 1) * 7.0
+        let i = Int(b.rounded())
+        return(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][i])
+    }
+    
+    func decimalTime() -> Double {
+        var d = Double(second) / 60.0
+        
+        d += Double(minute)
+        d /= 60.0
+        d += Double(hour)
+        return(d)
+    }
+    
+    
+    func gmtToGST() -> AstroDate {
+        
+        var d = Double(self.dayNumber())
+        
+        d *= 0.0657098
+        
+
+        let b = SwiftAstro().calculateConstB(date: self)
+        
+        let t0 = d - b
+        
+        let gmtDecimal = self.decimalTime() * 1.002738
+        
+        var t1 = t0 + gmtDecimal
+        
+        if (t1 > 24) {
+            t1 -= 24.0
+        } else if (t1 < 0) {
+            t1 += 24.0
+        }
+        
+        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
+        let fractionalSeconds = result.2.rounded(toPlaces: 3)
+
+        return(AstroDate(month: month, day: day, year: year, hour: result.0, minute: result.1, second: fractionalSeconds))
+    }
+    
+        func gstToGMT() -> AstroDate {
+          
+    
+            var d = Double(self.dayNumber())
+            d *= 0.0657098
+            let b = SwiftAstro().calculateConstB(date: self)
+    
+    
+    
+            var t0 = d - b
+            if (t0 < 0) {
+                t0 += 24
+            }
+    
+            let gstDecimal = self.decimalTime()
+    
+            var t1 = gstDecimal - t0
+            if (t1 < 0) {
+                t1 += 24
+            }
+    
+            t1 *= 0.997270
+    
+            let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
+    
+    
+            let fractionalSeconds = result.2.rounded(toPlaces: 3)
+                
+            return(AstroDate(month: month, day: day, year: year, hour: result.0, minute: result.1, second: fractionalSeconds))
+        }
     
 }
