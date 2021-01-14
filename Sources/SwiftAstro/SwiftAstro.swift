@@ -1,14 +1,14 @@
 import Foundation
 
 
-class SwiftAstro {
+class SwiftAstro  {
     
     func divideWithRemainder(a: Int, b: Int) -> (Int, Int) {
         return(Int(floor(Double(a) / Double(b))), a % b)
     }
     
     // Calculate the date of Easter
-    func dateOfEaster(year: Int) -> Date {
+    func dateOfEaster(year: Int) -> AstroDate {
         
         // Divide the year by 19
         let a = divideWithRemainder(a: year, b: 19).1
@@ -51,10 +51,7 @@ class SwiftAstro {
         let month = n
         let day = p + 1
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        let easterDate = formatter.date(from: "\(year)/\(month)/\(day)")!
-        return(easterDate)
+        return(AstroDate(month: month, day: day, year: year))
     }
     
     func julianDayToDate(jd: Double) -> Date {

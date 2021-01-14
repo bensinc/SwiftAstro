@@ -7,32 +7,20 @@ final class SwiftAstroTests: XCTestCase {
         let astro = SwiftAstro()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+
         let easterDate = formatter.date(from: "2000/04/23")!
-        XCTAssertEqual(astro.dateOfEaster(year: 2000), easterDate)
+        XCTAssertEqual(astro.dateOfEaster(year: 2000).toDate(), easterDate)
     }
 
     func testDayNumber() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        let date = formatter.date(from: "2000/5/13")!
-        XCTAssertEqual(date.dayNumber(), 134)
-
-        let formatter2 = DateFormatter()
-        formatter2.dateFormat = "yyyy/MM/dd"
-        let date2 = formatter.date(from: "2005/12/24")!
-        XCTAssertEqual(date2.dayNumber(), 358)
+        XCTAssertEqual(AstroDate(month: 5, day: 13, year: 2000).dayNumber(), 134)
+        XCTAssertEqual(AstroDate(month: 12, day: 24, year: 2005).dayNumber(), 358)
     }
 
     func testJulianDayNumber() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd hh:mm"
-        let date = formatter.date(from: "1985/2/17 06:00")!
-        XCTAssertEqual(date.julianDayNumber(), 2446113.75)
-
-        let formatter2 = DateFormatter()
-        formatter2.dateFormat = "yyyy/MM/dd hh:mm"
-        let date2 = formatter2.date(from: "1979/12/31 12:00")!
-        XCTAssertEqual(date2.julianDayNumber(), 2444238.5)
+        XCTAssertEqual(AstroDate(month: 2, day: 17, year: 1985, hour: 6).julianDayNumber(), 2446113.75)
+        XCTAssertEqual(AstroDate(month: 12, day: 31, year: 1979).julianDayNumber(), 2444238.5)
     }
 
     func testJulianDayToDate() {
