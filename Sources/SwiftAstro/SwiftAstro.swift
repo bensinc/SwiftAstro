@@ -2,21 +2,17 @@ import Foundation
 
 
 class SwiftAstro {
-    var text = "Hello, World!"
     
     func divideWithRemainder(a: Int, b: Int) -> (Int, Int) {
-        let r = Double(a) / Double(b)
-        let integerPart = Int(floor(r))
-        let remainderPart = Int(round(r.truncatingRemainder(dividingBy: 1) * Double(b)))
-        return(integerPart, remainderPart)
+        return(Int(floor(Double(a) / Double(b))), a % b)
     }
     
+    // Calculate the date of Easter
     func dateOfEaster(year: Int) -> Date {
         
         // Divide the year by 19
         let a = divideWithRemainder(a: year, b: 19).1
         
-
         // Divide the year by 100
         var r = divideWithRemainder(a: year, b: 100)
         let b = r.0
@@ -60,4 +56,70 @@ class SwiftAstro {
         let easterDate = formatter.date(from: "\(year)/\(month)/\(day)")!
         return(easterDate)
     }
+    
+    func julianDayToDate(jd: Double) -> Date {
+        let julianDate = jd + 0.5
+        
+        let i = Int(julianDate)
+        let f = julianDate - Double(i)
+        
+        var a = i
+        
+        if (i > 2299160) {
+            a = Int((Double(i) - 1867216.25) / 36524.25)
+        }
+        
+        let b = i + 1 + a - Int(Double(a) / 4.0)
+        
+        let c = b + 1524
+        
+        let d = Int((Double(c) - 122.1) / 365.25)
+        
+        let e = Int(365.25 * Double(d))
+        
+        let g = Int(Double(c - e) / 30.6001)
+        
+        let day = Double(c) - Double(e) + f - Double(Int(30.6001 * Double(g)))
+        
+        var month = g - 1
+        if (Double(g) > 13.5) {
+            month = g - 13
+        }
+        
+        var year = d - 4716
+        if (Double(month) < 2.5) {
+            year = d - 4715
+        }
+        
+        let hour = Int(24.0 * day.truncatingRemainder(dividingBy: 1))
+        
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd hh:mm"
+        let date = formatter.date(from: "\(year)/\(month)/\(Int(day)) \(hour):00")!
+        return(date)
+    }
+    
+    func decimalTimeToHMS(decimalTime: Double) -> (hour: Int, minute: Int, second: Double) {
+        let f = decimalTime.truncatingRemainder(dividingBy: 1) * 60.0
+        let minutes = Int(f)
+        let seconds = f.truncatingRemainder(dividingBy: 1) * 60.0
+        return(Int(decimalTime), minutes, seconds)
+    }
+    
+    func decimalTimeToDate(decimalTime: Double) -> Date {
+                   
+        let f = decimalTime.truncatingRemainder(dividingBy: 1) * 60.0
+        let minutes = Int(f)
+        let seconds = f.truncatingRemainder(dividingBy: 1) * 60
+        
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"        
+        return(formatter.date(from: "1980/01/01 \(Int(decimalTime)):\(minutes):\(Int(seconds))")!)
+    }
+    
+    
+    
 }
