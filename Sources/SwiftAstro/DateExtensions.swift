@@ -44,6 +44,7 @@ extension Date {
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         let date = formatter.date(from: "1582/10/15")!
         
         var year = Calendar.current.component(.year, from: self)
@@ -64,7 +65,8 @@ extension Date {
 
         let c = Int(365.25 * Double(year))
         let d = Int(30.6001 * (Double(month) + 1.0))
-        return(Double(b) + Double(c) + Double(d) + Double(day) + (Double(hour) / 24.0) + 1720994.5)
+        let jd = Double(b) + Double(c) + Double(d) + Double(day) + (Double(hour) / 24.0) + 1720994.5
+        return(jd)
     }
     
     func dayOfWeek() -> String {
@@ -87,11 +89,14 @@ extension Date {
         return(d)
     }
     
-    func siderealTime() -> Date {
+
+    
+    func gmtToGST() -> Date {
         let year = Calendar.current.component(.year, from: self)
         let month = Calendar.current.component(.month, from: self)
         let day = Calendar.current.component(.day, from: self)
-        let hour = Calendar.current.component(.hour, from: self)
+        
+        
 
         
         var d = Double(self.dayNumber())
@@ -100,18 +105,17 @@ extension Date {
         
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd hh:mm:ss.SSS"
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
-        let date = formatter.date(from: "\(year-1)/12/31 12:00:00.000")!
         
-        let jd = date.julianDayNumber()
-        
-        let s = jd - 2415020.0
-        let t = s / 36525.0
-        let r = 6.6460656 + (2400.051262 * t) + (0.00002581 * pow(t, 2))
-        let u = r - (24 * Double(year - 1900))
-        let b = 24 - u
+//        let jd = date.julianDayNumber()
+//
+//        let s = jd - 2415020.0
+//        let t = s / 36525.0
+//        let r = 6.6460656 + (2400.051262 * t) + (0.00002581 * pow(t, 2))
+//        let u = r - (24 * Double(year - 1900))
+        let b = SwiftAstro().calculateConstB(date: self)
         
         let t0 = d - b
         
@@ -127,11 +131,49 @@ extension Date {
         
         let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
         
-        // Round to 3 decimal places
-        var fractionalSeconds = Double(round(1000*result.2)/1000)
+        let fractionalSeconds = result.2.rounded(toPlaces: 3)
         
         let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
         let gstDate = formatter.date(from: fs)!
         return(gstDate)
+    }
+    
+    func gstToGMT() -> Date {
+        let year = Calendar.current.component(.year, from: self)
+        let month = Calendar.current.component(.month, from: self)
+        let day = Calendar.current.component(.day, from: self)
+        
+        var d = Double(self.dayNumber())
+        d *= 0.0657098
+        let b = SwiftAstro().calculateConstB(date: self)
+        
+        
+        
+        var t0 = d - b
+        if (t0 < 0) {
+            t0 += 24
+        }
+        
+        let gstDecimal = self.decimalTime()
+        
+        var t1 = gstDecimal - t0
+        if (t1 < 0) {
+            t1 += 24
+        }
+        
+        t1 *= 0.997270
+        
+        let result = SwiftAstro().decimalTimeToHMS(decimalTime: t1)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        
+        let fractionalSeconds = result.2.rounded(toPlaces: 3)
+        
+        let fs = "\(year)/\(month)/\(day) \(result.0):\(result.1):\(fractionalSeconds)"
+        let gmtDate = formatter.date(from: fs)!
+        return(gmtDate)
     }
 }

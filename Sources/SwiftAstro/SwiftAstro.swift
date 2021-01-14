@@ -120,6 +120,25 @@ class SwiftAstro {
         return(formatter.date(from: "1980/01/01 \(Int(decimalTime)):\(minutes):\(Int(seconds))")!)
     }
     
+    func calculateConstB(date: Date) -> Double {
+        let year = Calendar.current.component(.year, from: date)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        let d = formatter.date(from: "\(year-1)/12/31 6:00:00.000")!
+
+        let jd = d.julianDayNumber()
+        
+        let s = jd - 2415020.0
+        let t = s / 36525.0
+        let r = 6.6460656 + (2400.051262 * t) + (0.00002581 * pow(t, 2))
+        let u = r - (24 * Double(year - 1900))
+        let b = 24 - u
+        return(b)
+    }
+    
     
     
 }
