@@ -25,4 +25,39 @@ class HorizonCoordinate : Equatable, CustomStringConvertible {
         return lhs.altitude == rhs.altitude && lhs.azimuth == rhs.azimuth
     }
     
+    func toEquatorialCoordinate(date: AstroDate, latitude: Double) -> EquatorialCoordinate {
+        let φ = latitude
+        
+        let A = self.azimuth.toDecimal()
+        
+        let a = self.altitude.toDecimal()
+        
+        let sinδ = sin(a.degrees) * sin(φ.degrees) + cos(a.degrees) * cos(φ.degrees) * cos(A.degrees)
+        
+        let δ = asin(sinδ).rad
+        
+        let cosH = (sin(a.degrees) - sin(φ.degrees) * sin(δ.degrees)) / (cos(φ.degrees) * cos(δ.degrees))
+        
+        var H = acos(cosH).rad
+        
+        let sinA = sin(A.degrees)
+        if (sinA > 0) {
+            H = 360.0 - H
+        }
+        
+        H /= 15.0
+        
+        let hmsH = HMS(decimal: H)
+        let hmsδ = HMS(decimal: δ)
+        
+        let lst = date.decimalTime()
+        var α = lst - H
+        if (α < 0) {
+            α += 24
+        }
+        let hmsα = HMS(decimal: α)
+        
+        return(EquatorialCoordinate(rightAscension: hmsα, declination: hmsδ))
+    }
+    
 }

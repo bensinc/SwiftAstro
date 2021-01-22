@@ -8,7 +8,7 @@
 import Foundation
 
 ///  🔭 Represents a set of equatorial coordinates
-class EquatorialCoordinate {
+class EquatorialCoordinate: Equatable {
     
     var rightAscension: HMS
     var declination: HMS
@@ -16,6 +16,10 @@ class EquatorialCoordinate {
     init(rightAscension: HMS, declination: HMS) {
         self.rightAscension = rightAscension
         self.declination = declination
+    }
+    
+    static func == (lhs: EquatorialCoordinate, rhs: EquatorialCoordinate) -> Bool {
+        return lhs.rightAscension == rhs.rightAscension && lhs.declination == rhs.declination
     }
     
     /**
